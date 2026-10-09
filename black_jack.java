@@ -1,9 +1,10 @@
 import java.util.Scanner;
+import java.util.zip.ZipEntry;
 
 public class black_jack 
 {
 	private final Scanner scanner = new Scanner(System.in);
-	private int p1, p2, d1, d2;
+	private int p1, p2, d1, d2, pSum, pSumA1,pSumA2;
 
 	public static void main(String[] args) 
 	{
@@ -15,10 +16,9 @@ public class black_jack
 	{
 		System.out.println("Welcome to Blackjack!");
 
-		// TODO: Create and shuffle a deck, then deal cards to the player and dealer.
 		shuffle();
 		playerTurn();
-		System.out.println(randomCard());
+		playerDecision();
 		dealerTurn();
 		determineWinner();
 	}
@@ -32,12 +32,17 @@ public class black_jack
 	{
 		p1 = randomCard();
 		p2 = randomCard();
+		pSum = p1+p2;
+		if(p1 ==1)
+			pSumA1 = 11+p2;
+		if(p2 ==1)
+			pSumA2 = 11+p1;
 		d1 = randomCard();
 		d2 = randomCard();
 	}
-	private static String card(int n)
+	private static String toCard(int n)
 	{
-		String ans = n;
+		String ans = ""+n;
 		if(n == 1)
 			ans = "Ace";
 		if(n == 11)
@@ -50,20 +55,34 @@ public class black_jack
 	}
 	private void playerTurn() 
 	{
-		String fc = card(p1);
-		String sc = card(p2);
-
-		System.out.println(fc);
-		System.out.println(sc);
+		String fc = toCard(p1);
+		String sc = toCard(p2);
+		System.out.println(fc + " " +sc);
 	}
 
+	private void playerDecision()
+	{
+		System.out.println("Hit?");
+		if(scanner.next().equals("y"))
+		{
+			int n= randomCard();
+			System.out.println(toCard(n));
+			if(n>10)
+				pSum = pSum +10;
+			else
+				pSum = pSum +n;
+		
+			if(pSum >21)
+				System.out.println("You busted!");
+			else
+				playerDecision();
+		}
+	}
 	private void dealerTurn() 
 	{
-		// TODO: Make the dealer draw cards until reaching the required score.
 	}
 
 	private void determineWinner() 
 	{
-		// TODO: Compare hand scores and announce the result.
 	}
 }
