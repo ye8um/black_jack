@@ -6,10 +6,14 @@ public class black_jack
 	private final Scanner scanner = new Scanner(System.in);
 	private int[] p, d;
 	private int pSum, dSum;
+	private int money, bet;
+	private boolean result, tie;
 
 	public static void main(String[] args) 
 	{
+		System.out.println("Welcome to Blackjack!");
 		black_jack game = new black_jack();
+		game.money = 50;
 		while(true)
 		{
 			game.playGame();
@@ -22,8 +26,19 @@ public class black_jack
 
 	private void playGame() 
 	{
-		System.out.println("Welcome to Blackjack!");
-
+		result = false;
+		tie = false;
+		System.out.println("You have $" +money +". How much do you want to bet?");
+		if(scanner.hasNextInt())
+		{
+			bet = scanner.nextInt();
+			if(bet>money)
+			{
+				System.out.println("You cannot bet more than you have.");
+				return;
+			}
+		
+		}
 		shuffle();
 		playerTurn();
 		playerDecision(1);
@@ -32,6 +47,16 @@ public class black_jack
 			dealerTurn(1);
 			determineWinner();
 		}
+		if(result)
+			money = money + bet;
+		else if(!tie)
+			money = money - bet;
+		if(money <=0)
+		{
+			System.out.println("You ran out of money! Game over.");
+			System.exit(0);
+		}
+		System.out.println("You now have $" + money + ".");
 	}
 
 	private static int randomCard()
@@ -66,6 +91,7 @@ public class black_jack
 	}
 	private void playerTurn() 
 	{
+		System.out.println("Your Cards: ");
 		String fc = toCard(p[0]);
 		String sc = toCard(p[1]);
 		System.out.println(fc + " " +sc);
@@ -77,6 +103,7 @@ public class black_jack
 		if(scanner.next().equals("y"))
 		{
 			int c = randomCard();
+			p[n+1]=c;
 			System.out.println(toCard(c));
 			if(c>10)
 				pSum = pSum +10;
@@ -84,13 +111,23 @@ public class black_jack
 				pSum = pSum +c;
 		
 			if(pSum >21)
+			{
 				System.out.println("You busted!");
+				result = false;
+			}
 			else
 				playerDecision(n + 1);
 		}
+		else
+		{
+			for(int i = 0;i<n+1;i++)
+				if(p[i] == 1 && pSum +10 <=21)
+					pSum = pSum +10;
+		}
+		
 	}
 	private void dealerTurn(int n) 
-	{
+	{	
 		if(d[0] ==1)
 			if(dSum +10 <=21 || dSum + 10>=16)
 				dSum = dSum +10;
@@ -113,10 +150,11 @@ public class black_jack
 		{
 			System.out.println("Dealer busted!");
 			System.out.println("You Won!");
+			result = true;
 			return;
 		}
 		//System.out.println("Your Total: " +pSum +" --- " +"Dealer's Total: " + dSum);
-		System.out.print("Your Cards:");
+		System.out.print("Your Cards: ");
 		for(int i=0; i<21; i++)
 			if(p[i]!=0)
 				System.out.print(toCard(p[i]) + " ");
@@ -133,10 +171,17 @@ public class black_jack
 		if(dSum == pSum)
 		{
 			System.out.println("It's a tie!");
+			tie = true;
 		}
 		else if(pSum>dSum)
+		{
 			System.out.println("You Won!");
+			result = true;
+		}
 		else
+		{
 			System.out.println("You Lost!");
+			result = false;
+		}
 	}
-}
+} 
