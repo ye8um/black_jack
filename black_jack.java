@@ -1,9 +1,5 @@
 import java.util.Scanner;
 import java.util.zip.ZipEntry;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import javax.swing.JFrame;
 
 public class black_jack 
 {
@@ -15,26 +11,7 @@ public class black_jack
 
 	public static void main(String[] args) 
 	{
-		if(!GraphicsEnvironment.isHeadless())
-		{
-			JFrame frame = new JFrame("Blackjack");
-			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			frame.setSize(400,400);
-
-			JPanel panel = new JPanel();
-			panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-
-			panel.add(new JLabel("Welcome to Blackjack!"));
-			panel.add(new JLabel("You have $50. How much do you want to bet?"));
-			frame.add(panel);
-			frame.setVisible(true);
-		}
-		else
-		{
-			System.out.println("Welcome to Blackjack!");
-			System.out.println("You have $50. How much do you want to bet?");
-		}
-
+		System.out.println("Welcome to Blackjack!");
 		black_jack game = new black_jack();
 		game.money = 50;
 		while(true)
@@ -44,6 +21,7 @@ public class black_jack
 			if(!game.scanner.next().equals("r"))
 				break;
 		}
+		
 	}
 
 	private void playGame() 
@@ -54,17 +32,12 @@ public class black_jack
 		if(scanner.hasNextInt())
 		{
 			bet = scanner.nextInt();
-			if(bet <= 0 || bet > money)
+			if(bet>money)
 			{
-				System.out.println("Your bet must be between $1 and $" + money + ".");
+				System.out.println("You cannot bet more than you have.");
 				return;
 			}
-		}
-		else
-		{
-			System.out.println("Please enter a valid bet amount.");
-			scanner.next();
-			return;
+		
 		}
 		shuffle();
 		playerTurn();
@@ -91,38 +64,17 @@ public class black_jack
 		int n = (int)(Math.random()*13) +1;
 		return n;
 	}
-	private int handValue(int[] hand)
-	{
-		int total = 0;
-		int aces = 0;
-		for(int i = 0; i < hand.length && hand[i] != 0; i++)
-		{
-			if(hand[i] == 1)
-			{
-				aces++;
-				total += 1;
-			}
-			else
-				total += hand[i] > 10 ? 10 : hand[i];
-		}
-		while(aces > 0 && total + 10 <= 21)
-		{
-			total += 10;
-			aces--;
-		}
-		return total;
-	}
 	private void shuffle()
 	{
 		p = new int[21];
 		d = new int[21];
 		p[0] = randomCard();
 		p[1] = randomCard();
-		pSum = handValue(p);
+		pSum = p[0] + p[1];
 		
 		d[0] = randomCard();
 		d[1] = randomCard();
-		dSum = handValue(d);
+		dSum = d[0] + d[1];
 	}
 	private static String toCard(int n)
 	{
@@ -151,33 +103,45 @@ public class black_jack
 		if(scanner.next().equals("y"))
 		{
 			int c = randomCard();
-			p[n + 1] = c;
+			p[n+1]=c;
 			System.out.println(toCard(c));
-			pSum = handValue(p);
-			if(pSum > 21)
+			if(c>10)
+				pSum = pSum +10;
+			else
+				pSum = pSum +c;
+		
+			if(pSum >21)
 			{
 				System.out.println("You busted!");
 				result = false;
-				return;
 			}
-			playerDecision(n + 1);
+			else
+				playerDecision(n + 1);
 		}
 		else
 		{
-			pSum = handValue(p);
+			for(int i = 0;i<n+1;i++)
+				if(p[i] == 1 && pSum +10 <=21)
+					pSum = pSum +10;
 		}
 		
 	}
 	private void dealerTurn(int n) 
-	{
-		dSum = handValue(d);
-		if(dSum < 16)
-		{
+	{	
+		if(d[0] ==1)
+			if(dSum +10 <=21 || dSum + 10>=16)
+				dSum = dSum +10;
+		if(d[1] ==1)
+			if(dSum +10 <=21 || dSum + 10>=16)
+				dSum = dSum +10;
+		if(dSum<16)
 			d[n+1] = randomCard();
-			dSum = handValue(d);
+			if(d[n+1] > 10)
+				dSum = dSum + 10;
+			else
+				dSum = dSum + d[n+1];
 			if(dSum < 16)
 				dealerTurn(n + 1);
-		}
 	}
 
 	private void determineWinner() 
